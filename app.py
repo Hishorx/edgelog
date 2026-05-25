@@ -68,7 +68,8 @@ class Trade(db.Model):
     user_id = db.Column(db.Integer)
     symbol = db.Column(db.String(50))
     result = db.Column(db.String(20))
-    profit = db.Column(db.Float)
+
+    profit = db.Column(db.Float)   # pips or money
     notes = db.Column(db.String(500))
     date = db.Column(db.String(50))
 
@@ -114,6 +115,26 @@ def home():
         equity=equity,
         calendar=calendar
     )
+    profits = [t.profit for t in trades]
+
+    total_profit = sum(profits) if profits else 0
+
+    wins = len([t for t in trades if t.result == "win"])
+    losses = len([t for t in trades if t.result == "loss"])
+
+    win_rate = (wins / len(trades) * 100) if trades else 0
+
+    # streak calculation
+    current_streak = 0
+    best_streak = 0
+    temp = 0
+
+    for t in trades:
+     if t.result == "win":
+        temp += 1
+        best_streak = max(best_streak, temp)
+     else:
+        temp = 0
 
 # ---------------- REGISTER ----------------
 @app.route("/register", methods=["GET", "POST"])

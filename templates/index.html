@@ -30,6 +30,14 @@
         }
     </style>
 </head>
+
+<!-- TOP BAR -->
+<div class="p-5 flex justify-between items-center border-b border-gray-800">
+    <h1 class="text-xl font-semibold">EdgeLog</h1>
+    <span class="text-xs text-gray-400">AI Trading Journal</span>
+</div>
+
+<div class="max-w-6xl mx-auto p-5">
 <div class="glass p-5 rounded-3xl mb-6">
 
     <h2 class="text-lg font-semibold">💡 Daily Motivation</h2>
@@ -52,13 +60,6 @@ document.getElementById("quote").innerText =
 </script>
 <body class="text-white">
 
-<!-- TOP BAR -->
-<div class="p-5 flex justify-between items-center border-b border-gray-800">
-    <h1 class="text-xl font-semibold">EdgeLog</h1>
-    <span class="text-xs text-gray-400">AI Trading Journal</span>
-</div>
-
-<div class="max-w-6xl mx-auto p-5">
 
 <!-- AI INSIGHT PANEL -->
 <div class="glass p-5 rounded-3xl mb-6">
@@ -92,6 +93,30 @@ fetch("/ai-insight")
     <div class="glass p-4 rounded-2xl text-center card">
         <p class="text-gray-400 text-xs">Status</p>
         <h2 class="text-xl font-bold text-blue-400">Active</h2>
+    </div>
+
+</div>
+<div class="grid grid-cols-3 gap-3 mb-6">
+
+    <div class="glass p-4 rounded-2xl text-center">
+        <p class="text-xs text-gray-400">Total Profit</p>
+        <h2 class="text-lg font-bold text-green-400">
+            {{total_profit}}
+        </h2>
+    </div>
+
+    <div class="glass p-4 rounded-2xl text-center">
+        <p class="text-xs text-gray-400">Wins / Losses</p>
+        <h2 class="text-lg font-bold">
+            {{wins}} / {{losses}}
+        </h2>
+    </div>
+
+    <div class="glass p-4 rounded-2xl text-center">
+        <p class="text-xs text-gray-400">Best Streak</p>
+        <h2 class="text-lg font-bold text-blue-400">
+            {{best_streak}}
+        </h2>
     </div>
 
 </div>
