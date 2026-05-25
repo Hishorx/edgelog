@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import re
 from datetime import datetime
 
 app = Flask(__name__)
@@ -12,13 +13,24 @@ app.secret_key = "edgelog_secret"
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 # Fix postgres:// issue
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
+if not DATABASE_URL:
+    DATABASE_URL = "sqlite:///edgelog.db"  # fallback for local testing
+else:
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+def is_strong_password(password):
+    return (
+        len(password) >= 8 and
+        re.search(r"[A-Z]", password) and
+        re.search(r"[a-z]", password) and
+        re.search(r"[0-9]", password)
+    )
 
 # ---------------- MODELS ----------------
 class User(db.Model):
@@ -85,7 +97,11 @@ def register():
     if request.method == "POST":
 
         username = request.form["username"]
-        password = generate_password_hash(request.form["password"])
+        password_raw = request.form["password"]
+
+    if not is_strong_password(password_raw):
+        return "Weak password! Use 8+ chars, A-Z, a-z, 0-9"
+        password = generate_password_hash(password_raw)
 
         existing = User.query.filter_by(username=username).first()
 
