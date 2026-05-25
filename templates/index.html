@@ -2,129 +2,140 @@
 <html>
 <head>
     <title>EdgeLog</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+            "Segoe UI", Roboto, sans-serif;
+            background: #0b0f17;
+        }
+
+        .glass {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .card {
+            transition: 0.2s;
+        }
+
+        .card:hover {
+            transform: scale(1.02);
+        }
+    </style>
 </head>
 
-<body class="bg-gray-950 text-white">
+<body class="text-white">
 
-<!-- NAVBAR -->
-<div class="flex justify-between items-center p-5 bg-gray-900">
-    <h1 class="text-2xl font-bold text-blue-400">EdgeLog</h1>
-    <p class="text-gray-400">Trading Journal Dashboard</p>
+<!-- TOP BAR -->
+<div class="p-5 flex justify-between items-center border-b border-gray-800">
+    <h1 class="text-xl font-semibold">EdgeLog</h1>
+    <span class="text-xs text-gray-400">AI Trading Journal</span>
 </div>
 
 <div class="max-w-6xl mx-auto p-5">
 
+<!-- AI INSIGHT PANEL -->
+<div class="glass p-5 rounded-3xl mb-6 card">
+    <h2 class="text-lg font-semibold mb-2">🤖 AI Coach</h2>
+
+    <p class="text-gray-300 text-sm">
+        Your trading consistency is improving. Avoid emotional entries and stick to your plan.
+    </p>
+
+    <div class="mt-4 text-xs text-gray-500">
+        “Discipline creates profits. Not frequency.”
+    </div>
+</div>
+
 <!-- STATS -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+<div class="grid grid-cols-3 gap-3 mb-6">
 
-    <div class="bg-gray-800 p-5 rounded-xl">
-        <h2 class="text-3xl font-bold">{{total}}</h2>
-        <p class="text-gray-400">Total Trades</p>
+    <div class="glass p-4 rounded-2xl text-center card">
+        <p class="text-gray-400 text-xs">Trades</p>
+        <h2 class="text-xl font-bold">{{total}}</h2>
     </div>
 
-    <div class="bg-gray-800 p-5 rounded-xl">
-        <h2 class="text-3xl font-bold text-green-400">{{win_rate}}%</h2>
-        <p class="text-gray-400">Win Rate</p>
+    <div class="glass p-4 rounded-2xl text-center card">
+        <p class="text-gray-400 text-xs">Win Rate</p>
+        <h2 class="text-xl font-bold text-green-400">{{win_rate}}%</h2>
     </div>
 
-    <div class="bg-gray-800 p-5 rounded-xl">
-        <h2 class="text-3xl font-bold text-blue-400">Active</h2>
-        <p class="text-gray-400">System Status</p>
+    <div class="glass p-4 rounded-2xl text-center card">
+        <p class="text-gray-400 text-xs">Status</p>
+        <h2 class="text-xl font-bold text-blue-400">Active</h2>
     </div>
 
 </div>
 
 <!-- CHART -->
-<div class="bg-gray-800 p-5 rounded-xl mb-6">
-    <h2 class="mb-3 font-bold">📈 Equity Curve</h2>
+<div class="glass p-5 rounded-3xl mb-6 card">
+    <h2 class="mb-3 font-semibold">Equity Curve</h2>
     <canvas id="chart"></canvas>
 </div>
 
 <!-- ADD TRADE -->
-<div class="bg-gray-800 p-5 rounded-xl mb-6">
+<div class="glass p-5 rounded-3xl mb-6 card">
 
-    <h2 class="mb-3 font-bold">➕ Add Trade</h2>
+    <h2 class="mb-3 font-semibold">➕ Add Trade</h2>
 
     <form method="POST" action="/add" class="grid gap-3">
 
         <input name="symbol" placeholder="EURUSD"
-            class="p-3 rounded bg-gray-900">
+            class="p-3 rounded-xl bg-black border border-gray-700">
 
         <select name="result"
-            class="p-3 rounded bg-gray-900">
+            class="p-3 rounded-xl bg-black border border-gray-700">
             <option value="win">Win</option>
             <option value="loss">Loss</option>
         </select>
 
         <input name="profit" placeholder="Profit / Loss"
-            class="p-3 rounded bg-gray-900">
+            class="p-3 rounded-xl bg-black border border-gray-700">
 
-        <input name="notes" placeholder="Notes"
-            class="p-3 rounded bg-gray-900">
+        <input name="notes" placeholder="Trade Notes"
+            class="p-3 rounded-xl bg-black border border-gray-700">
 
-        <button class="bg-blue-500 p-3 rounded font-bold">
-            Add Trade
+        <button class="bg-white text-black p-3 rounded-xl font-semibold">
+            Save Trade
         </button>
 
     </form>
 
 </div>
 
-<!-- CALENDAR -->
-<div class="bg-gray-800 p-5 rounded-xl mb-6">
+<!-- HISTORY -->
+<div class="glass p-5 rounded-3xl card">
 
-    <h2 class="mb-3 font-bold">📅 Daily P/L</h2>
+    <h2 class="mb-3 font-semibold">📊 Trade History</h2>
 
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+    <div class="space-y-2">
 
-        {% for day, value in calendar.items() %}
-        <div class="p-3 rounded text-center
-            {% if value >= 0 %} bg-green-600 {% else %} bg-red-600 {% endif %}">
-            <p class="text-sm">{{day}}</p>
-            <p class="font-bold">{{value}}</p>
+        {% for t in trades %}
+        <div class="p-3 rounded-xl bg-black border border-gray-800 flex justify-between">
+
+            <div>
+                <p class="font-semibold">{{t.symbol}}</p>
+                <p class="text-xs text-gray-500">{{t.notes}}</p>
+            </div>
+
+            <div class="text-right">
+                <p class="{% if t.result=='win' %}text-green-400{% else %}text-red-400{% endif %}">
+                    {{t.profit}}
+                </p>
+                <p class="text-xs text-gray-500">{{t.date}}</p>
+            </div>
+
         </div>
         {% endfor %}
 
     </div>
-
-</div>
-
-<!-- TRADES TABLE -->
-<div class="bg-gray-800 p-5 rounded-xl">
-
-    <h2 class="mb-3 font-bold">📜 Trade History</h2>
-
-    <table class="w-full text-left">
-
-        <tr class="text-gray-400 border-b border-gray-700">
-            <th>Pair</th>
-            <th>Result</th>
-            <th>Profit</th>
-            <th>Notes</th>
-            <th>Date</th>
-        </tr>
-
-        {% for t in trades %}
-        <tr class="border-b border-gray-700">
-
-            <td>{{t["symbol"]}}</td>
-
-            <td class="{% if t['result']=='win' %}text-green-400{% else %}text-red-400{% endif %}">
-                {{t["result"]}}
-            </td>
-
-            <td>{{t["profit"]}}</td>
-            <td>{{t["notes"]}}</td>
-            <td>{{t["date"]}}</td>
-
-        </tr>
-        {% endfor %}
-
-    </table>
 
 </div>
 
@@ -139,11 +150,18 @@ new Chart(document.getElementById("chart"), {
     data: {
         labels: equity.map((_, i) => i + 1),
         datasets: [{
-            label: "Equity",
             data: equity,
-            borderColor: "#3b82f6",
-            tension: 0.3
+            borderColor: "#ffffff",
+            tension: 0.35,
+            pointRadius: 0
         }]
+    },
+    options: {
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { display: false },
+            y: { display: false }
+        }
     }
 });
 </script>
