@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EdgeLog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body class="bg-gray-950 text-white">
+
+<!-- NAVBAR -->
+<div class="flex justify-between items-center p-5 bg-gray-900">
+    <h1 class="text-2xl font-bold text-blue-400">EdgeLog</h1>
+    <p class="text-gray-400">Trading Journal Dashboard</p>
+</div>
+
+<div class="max-w-6xl mx-auto p-5">
+
+<!-- STATS -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+    <div class="bg-gray-800 p-5 rounded-xl">
+        <h2 class="text-3xl font-bold">{{total}}</h2>
+        <p class="text-gray-400">Total Trades</p>
+    </div>
+
+    <div class="bg-gray-800 p-5 rounded-xl">
+        <h2 class="text-3xl font-bold text-green-400">{{win_rate}}%</h2>
+        <p class="text-gray-400">Win Rate</p>
+    </div>
+
+    <div class="bg-gray-800 p-5 rounded-xl">
+        <h2 class="text-3xl font-bold text-blue-400">Active</h2>
+        <p class="text-gray-400">System Status</p>
+    </div>
+
+</div>
+
+<!-- CHART -->
+<div class="bg-gray-800 p-5 rounded-xl mb-6">
+    <h2 class="mb-3 font-bold">📈 Equity Curve</h2>
+    <canvas id="chart"></canvas>
+</div>
+
+<!-- ADD TRADE -->
+<div class="bg-gray-800 p-5 rounded-xl mb-6">
+
+    <h2 class="mb-3 font-bold">➕ Add Trade</h2>
+
+    <form method="POST" action="/add" class="grid gap-3">
+
+        <input name="symbol" placeholder="EURUSD"
+            class="p-3 rounded bg-gray-900">
+
+        <select name="result"
+            class="p-3 rounded bg-gray-900">
+            <option value="win">Win</option>
+            <option value="loss">Loss</option>
+        </select>
+
+        <input name="profit" placeholder="Profit / Loss"
+            class="p-3 rounded bg-gray-900">
+
+        <input name="notes" placeholder="Notes"
+            class="p-3 rounded bg-gray-900">
+
+        <button class="bg-blue-500 p-3 rounded font-bold">
+            Add Trade
+        </button>
+
+    </form>
+
+</div>
+
+<!-- CALENDAR -->
+<div class="bg-gray-800 p-5 rounded-xl mb-6">
+
+    <h2 class="mb-3 font-bold">📅 Daily P/L</h2>
+
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+
+        {% for day, value in calendar.items() %}
+        <div class="p-3 rounded text-center
+            {% if value >= 0 %} bg-green-600 {% else %} bg-red-600 {% endif %}">
+            <p class="text-sm">{{day}}</p>
+            <p class="font-bold">{{value}}</p>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+<!-- TRADES TABLE -->
+<div class="bg-gray-800 p-5 rounded-xl">
+
+    <h2 class="mb-3 font-bold">📜 Trade History</h2>
+
+    <table class="w-full text-left">
+
+        <tr class="text-gray-400 border-b border-gray-700">
+            <th>Pair</th>
+            <th>Result</th>
+            <th>Profit</th>
+            <th>Notes</th>
+            <th>Date</th>
+        </tr>
+
+        {% for t in trades %}
+        <tr class="border-b border-gray-700">
+
+            <td>{{t["symbol"]}}</td>
+
+            <td class="{% if t['result']=='win' %}text-green-400{% else %}text-red-400{% endif %}">
+                {{t["result"]}}
+            </td>
+
+            <td>{{t["profit"]}}</td>
+            <td>{{t["notes"]}}</td>
+            <td>{{t["date"]}}</td>
+
+        </tr>
+        {% endfor %}
+
+    </table>
+
+</div>
+
+</div>
+
+<!-- CHART SCRIPT -->
+<script>
+const equity = {{ equity|tojson }};
+
+new Chart(document.getElementById("chart"), {
+    type: "line",
+    data: {
+        labels: equity.map((_, i) => i + 1),
+        datasets: [{
+            label: "Equity",
+            data: equity,
+            borderColor: "#3b82f6",
+            tension: 0.3
+        }]
+    }
+});
+</script>
+
+</body>
+</html>
