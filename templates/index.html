@@ -30,7 +30,26 @@
         }
     </style>
 </head>
+<div class="glass p-5 rounded-3xl mb-6">
 
+    <h2 class="text-lg font-semibold">💡 Daily Motivation</h2>
+
+    <p id="quote" class="text-gray-300 text-sm mt-2"></p>
+
+</div>
+
+<script>
+const quotes = [
+    "Discipline beats intelligence in trading.",
+    "Protect capital first, profits come later.",
+    "Losses are lessons, not failures.",
+    "Trade less, think more.",
+    "Consistency builds wealth."
+];
+
+document.getElementById("quote").innerText =
+    quotes[Math.floor(Math.random() * quotes.length)];
+</script>
 <body class="text-white">
 
 <!-- TOP BAR -->
@@ -42,18 +61,21 @@
 <div class="max-w-6xl mx-auto p-5">
 
 <!-- AI INSIGHT PANEL -->
-<div class="glass p-5 rounded-3xl mb-6 card">
-    <h2 class="text-lg font-semibold mb-2">🤖 AI Coach</h2>
+<div class="glass p-5 rounded-3xl mb-6">
+    <h2 class="text-lg font-semibold">🤖 AI Coach</h2>
 
-    <p class="text-gray-300 text-sm">
-        Your trading consistency is improving. Avoid emotional entries and stick to your plan.
+    <p id="aiText" class="text-gray-300 text-sm mt-2">
+        Loading AI analysis...
     </p>
-
-    <div class="mt-4 text-xs text-gray-500">
-        “Discipline creates profits. Not frequency.”
-    </div>
 </div>
 
+<script>
+fetch("/ai-insight")
+.then(res => res.json())
+.then(data => {
+    document.getElementById("aiText").innerText = data.ai;
+});
+</script>
 <!-- STATS -->
 <div class="grid grid-cols-3 gap-3 mb-6">
 
@@ -81,31 +103,38 @@
 </div>
 
 <!-- ADD TRADE -->
-<div class="glass p-5 rounded-3xl mb-6 card">
+<form method="POST" action="/add" class="grid gap-3">
 
-    <h2 class="mb-3 font-semibold">➕ Add Trade</h2>
+    <!-- PAIR -->
+    <select name="symbol"
+        class="p-3 rounded-xl bg-black border border-gray-700">
+        <option>EURUSD</option>
+        <option>GBPUSD</option>
+        <option>USDJPY</option>
+        <option>XAUUSD (Gold)</option>
+        <option>BTCUSD</option>
+    </select>
 
-    <form method="POST" action="/add" class="grid gap-3">
+    <!-- RESULT -->
+    <select name="result"
+        class="p-3 rounded-xl bg-black border border-gray-700">
+        <option value="win">Win</option>
+        <option value="loss">Loss</option>
+    </select>
 
-        <input name="symbol" placeholder="EURUSD"
-            class="p-3 rounded-xl bg-black border border-gray-700">
+    <!-- PIPS -->
+    <input name="profit" placeholder="Pips (e.g. +25 / -15)"
+        class="p-3 rounded-xl bg-black border border-gray-700">
 
-        <select name="result"
-            class="p-3 rounded-xl bg-black border border-gray-700">
-            <option value="win">Win</option>
-            <option value="loss">Loss</option>
-        </select>
+    <!-- NOTES -->
+    <input name="notes" placeholder="Trade Reason / Setup"
+        class="p-3 rounded-xl bg-black border border-gray-700">
 
-        <input name="profit" placeholder="Profit / Loss"
-            class="p-3 rounded-xl bg-black border border-gray-700">
+    <button class="bg-white text-black p-3 rounded-xl font-semibold">
+        Save Trade
+    </button>
 
-        <input name="notes" placeholder="Trade Notes"
-            class="p-3 rounded-xl bg-black border border-gray-700">
-
-        <button class="bg-white text-black p-3 rounded-xl font-semibold">
-            Save Trade
-        </button>
-
+</form>
     </form>
 
 </div>

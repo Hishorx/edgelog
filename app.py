@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import re
+from openai import OpenAI
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 from datetime import datetime
 
 app = Flask(__name__)
@@ -31,7 +33,30 @@ def is_strong_password(password):
         re.search(r"[a-z]", password) and
         re.search(r"[0-9]", password)
     )
+#----------------ai--------------------
 
+@app.route("/ai-insight")
+def ai_insight():
+
+    if "user_id" not in session:
+        return {"error": "not logged in"}
+
+    trades = Trade.query.filter_by(user_id=session["user_id"]).all()
+
+    summary = ""
+
+    for t in trades[-10:]:
+        summary += f"{t.symbol} {t.result} {t.profit}\n"
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are a professional trading coach. Give short, strict, useful advice."},
+            {"role": "user", "content": f"Analyze this trader performance:\n{summary}"}
+        ]
+    )
+
+    return {"ai": response.choices[0].message.content}
 # ---------------- MODELS ----------------
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
